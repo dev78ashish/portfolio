@@ -12,30 +12,30 @@ const SkillsSection = () => {
   const particlesContainerRef = useRef(null);
   const [mounted, setMounted] = useState(false);
   
-  // Skills data with proficiency levels (0-100)
-  const frontendSkills = [
-    { name: "React", proficiency: 92 },
-    { name: "JavaScript", proficiency: 90 },
-    { name: "HTML/CSS", proficiency: 95 },
-    { name: "TailwindCSS", proficiency: 88 },
-    { name: "TypeScript", proficiency: 85 }
-  ];
-  
-  const backendSkills = [
-    { name: "Node.js", proficiency: 86 },
-    { name: "Express", proficiency: 84 },
-    { name: "MongoDB", proficiency: 80 },
-    { name: "SQL", proficiency: 78 },
-    { name: "Python", proficiency: 75 }
-  ];
-  
-  const otherSkills = [
-    { name: "Three.js", proficiency: 70 },
-    { name: "GSAP", proficiency: 82 },
-    { name: "Git", proficiency: 88 },
-    { name: "Docker", proficiency: 72 },
-    { name: "AWS", proficiency: 68 }
-  ];
+  // Skills data - without proficiency levels
+  const skills = {
+    frontend: [
+      { name: "React", icon: "⚛️" },
+      { name: "JavaScript", icon: "JS" },
+      { name: "HTML/CSS", icon: "</>" },
+      { name: "TailwindCSS", icon: "TW" },
+      { name: "TypeScript", icon: "TS" }
+    ],
+    backend: [
+      { name: "Node.js", icon: "🟢" },
+      { name: "Express", icon: "EX" },
+      { name: "MongoDB", icon: "DB" },
+      { name: "SQL", icon: "SQL" },
+      { name: "Python", icon: "PY" }
+    ],
+    other: [
+      { name: "Three.js", icon: "3D" },
+      { name: "GSAP", icon: "GS" },
+      { name: "Git", icon: "GIT" },
+      { name: "Docker", icon: "🐳" },
+      { name: "AWS", icon: "AWS" }
+    ]
+  };
 
   // Set up the particles animation
   useEffect(() => {
@@ -69,7 +69,6 @@ const SkillsSection = () => {
     // Fill the positions array with random values
     for (let i = 0; i < particlesCount * 3; i++) {
       // Position particles in a rough sphere shape
-      // This creates a more concentrated effect in the center
       const angle1 = Math.random() * Math.PI * 2;
       const angle2 = Math.random() * Math.PI * 2;
       const radius = 5 + Math.random() * 15;
@@ -175,12 +174,12 @@ const SkillsSection = () => {
         // Set initial states
         gsap.set(titleSplit.chars, { opacity: 0, y: 50 });
         
-        // Select all skill progress bars and cards
-        const skillBars = document.querySelectorAll('.skill-progress-fill');
-        const skillCards = document.querySelectorAll('.skill-category');
+        // Select all skill cards
+        const skillCards = document.querySelectorAll('.skill-card');
+        const categoryTitles = document.querySelectorAll('.category-title');
         
-        gsap.set(skillBars, { width: 0 });
-        gsap.set(skillCards, { opacity: 0, y: 50 });
+        gsap.set(skillCards, { opacity: 0, y: 30, scale: 0.9 });
+        gsap.set(categoryTitles, { opacity: 0, y: 30 });
         
         // Create scroll trigger for the entire section
         const masterTimeline = gsap.timeline({
@@ -201,24 +200,24 @@ const SkillsSection = () => {
           ease: 'power3.out'
         }, 0);
         
-        // Animate skill category cards
-        masterTimeline.to(skillCards, {
+        // Animate category titles
+        masterTimeline.to(categoryTitles, {
           opacity: 1,
           y: 0,
           stagger: 0.2,
           duration: 0.8,
           ease: 'power3.out'
-        }, 0.5);
+        }, 0.4);
         
-        // Animate skill bars
-        masterTimeline.to(skillBars, {
-          width: function(index, target) {
-            return target.getAttribute('data-percent') + '%';
-          },
-          duration: 1.5,
+        // Animate skill cards
+        masterTimeline.to(skillCards, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
           stagger: 0.05,
-          ease: 'power2.out'
-        }, 0.8);
+          duration: 0.8,
+          ease: 'back.out(1.5)'
+        }, 0.6);
         
       } catch (error) {
         console.error('Animation setup error:', error);
@@ -236,34 +235,16 @@ const SkillsSection = () => {
     };
   }, [mounted]);
 
-  // Render skill item
-  const renderSkillItem = (skill, index) => (
-    <div key={index} className="mb-4">
-      <div className="flex justify-between mb-1">
-        <span className="text-sm font-['Manrope'] text-stone-300">{skill.name}</span>
-        <span className="text-xs font-['Manrope'] text-stone-400">{skill.proficiency}%</span>
-      </div>
-      <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-        <div 
-          className="skill-progress-fill h-full bg-gradient-to-r from-stone-500 to-stone-400 rounded-full"
-          data-percent={skill.proficiency}
-        ></div>
-      </div>
-    </div>
-  );
-
   return (
     <section 
       ref={sectionRef} 
       className="relative min-h-screen w-full py-24 text-white bg-zinc-900 overflow-hidden"
     >
-      {/* Particle animation container - absolute positioned to fill the space */}
+      {/* Particle animation container */}
       <div 
         ref={particlesContainerRef} 
         className="absolute inset-0 z-0 opacity-40"
-      >
-        {/* Three.js will inject the canvas here */}
-      </div>
+      ></div>
       
       <div className="container mx-auto px-6 md:px-12 relative z-10">
         {/* Section Title */}
@@ -277,60 +258,96 @@ const SkillsSection = () => {
         {/* Skills Container */}
         <div 
           ref={skillsContainerRef}
-          className="mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="mt-16 space-y-16"
         >
           {/* Frontend Skills */}
-          <div className="skill-category bg-zinc-800/50 backdrop-blur-sm border border-zinc-700 rounded-lg p-6 hover:border-zinc-600 transition-all duration-300">
-            <div className="flex items-center mb-6">
-              <div className="h-10 w-10 flex items-center justify-center rounded bg-stone-700/50 text-stone-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div>
+            <h3 className="category-title text-xl font-['Manrope'] uppercase tracking-wider text-stone-300 mb-8 flex items-center">
+              <div className="h-8 w-8 flex items-center justify-center rounded bg-stone-700/50 text-stone-300 mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
                   <line x1="12" y1="22" x2="12" y2="15.5"/>
                   <polyline points="22 8.5 12 15.5 2 8.5"/>
                 </svg>
               </div>
-              <h3 className="ml-3 text-lg font-['Manrope'] uppercase tracking-wider text-stone-300">Frontend</h3>
-            </div>
+              Frontend
+            </h3>
             
-            <div className="space-y-4">
-              {frontendSkills.map(renderSkillItem)}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {skills.frontend.map((skill, index) => (
+                <div 
+                  key={index} 
+                  className="skill-card bg-zinc-800/50 backdrop-blur-sm border border-zinc-700 rounded-lg p-4 hover:border-zinc-500 transition-all duration-300 hover:shadow-lg hover:shadow-zinc-800/20 hover:-translate-y-1 group"
+                >
+                  <div className="flex flex-col items-center justify-center text-center h-full">
+                    <div className="h-12 w-12 flex items-center justify-center rounded-full bg-stone-700/50 text-stone-300 mb-3 group-hover:bg-stone-600/50 transition-colors duration-300">
+                      <span className="text-lg font-medium">{skill.icon}</span>
+                    </div>
+                    <span className="text-stone-300 font-['Manrope'] text-sm md:text-base">{skill.name}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
           
           {/* Backend Skills */}
-          <div className="skill-category bg-zinc-800/50 backdrop-blur-sm border border-zinc-700 rounded-lg p-6 hover:border-zinc-600 transition-all duration-300">
-            <div className="flex items-center mb-6">
-              <div className="h-10 w-10 flex items-center justify-center rounded bg-stone-700/50 text-stone-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div>
+            <h3 className="category-title text-xl font-['Manrope'] uppercase tracking-wider text-stone-300 mb-8 flex items-center">
+              <div className="h-8 w-8 flex items-center justify-center rounded bg-stone-700/50 text-stone-300 mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
                   <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
                   <line x1="6" y1="6" x2="6.01" y2="6"/>
                   <line x1="6" y1="18" x2="6.01" y2="18"/>
                 </svg>
               </div>
-              <h3 className="ml-3 text-lg font-['Manrope'] uppercase tracking-wider text-stone-300">Backend</h3>
-            </div>
+              Backend
+            </h3>
             
-            <div className="space-y-4">
-              {backendSkills.map(renderSkillItem)}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {skills.backend.map((skill, index) => (
+                <div 
+                  key={index} 
+                  className="skill-card bg-zinc-800/50 backdrop-blur-sm border border-zinc-700 rounded-lg p-4 hover:border-zinc-500 transition-all duration-300 hover:shadow-lg hover:shadow-zinc-800/20 hover:-translate-y-1 group"
+                >
+                  <div className="flex flex-col items-center justify-center text-center h-full">
+                    <div className="h-12 w-12 flex items-center justify-center rounded-full bg-stone-700/50 text-stone-300 mb-3 group-hover:bg-stone-600/50 transition-colors duration-300">
+                      <span className="text-lg font-medium">{skill.icon}</span>
+                    </div>
+                    <span className="text-stone-300 font-['Manrope'] text-sm md:text-base">{skill.name}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
           
           {/* Other Skills */}
-          <div className="skill-category bg-zinc-800/50 backdrop-blur-sm border border-zinc-700 rounded-lg p-6 hover:border-zinc-600 transition-all duration-300 md:col-span-2 lg:col-span-1">
-            <div className="flex items-center mb-6">
-              <div className="h-10 w-10 flex items-center justify-center rounded bg-stone-700/50 text-stone-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div>
+            <h3 className="category-title text-xl font-['Manrope'] uppercase tracking-wider text-stone-300 mb-8 flex items-center">
+              <div className="h-8 w-8 flex items-center justify-center rounded bg-stone-700/50 text-stone-300 mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                   <path d="M2 17l10 5 10-5"/>
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <h3 className="ml-3 text-lg font-['Manrope'] uppercase tracking-wider text-stone-300">Other</h3>
-            </div>
+              Other
+            </h3>
             
-            <div className="space-y-4">
-              {otherSkills.map(renderSkillItem)}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {skills.other.map((skill, index) => (
+                <div 
+                  key={index} 
+                  className="skill-card bg-zinc-800/50 backdrop-blur-sm border border-zinc-700 rounded-lg p-4 hover:border-zinc-500 transition-all duration-300 hover:shadow-lg hover:shadow-zinc-800/20 hover:-translate-y-1 group"
+                >
+                  <div className="flex flex-col items-center justify-center text-center h-full">
+                    <div className="h-12 w-12 flex items-center justify-center rounded-full bg-stone-700/50 text-stone-300 mb-3 group-hover:bg-stone-600/50 transition-colors duration-300">
+                      <span className="text-lg font-medium">{skill.icon}</span>
+                    </div>
+                    <span className="text-stone-300 font-['Manrope'] text-sm md:text-base">{skill.name}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

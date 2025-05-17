@@ -8,6 +8,7 @@ import Footer from './components/Footer'
 import TextSection from './components/TextSection'
 import AboutSection from './components/AboutSection'
 import SkillsSection from './components/SkillsSection'
+import ProjectsSection from './components/ProjectsSection'
 
 const App = () => {
 
@@ -28,7 +29,7 @@ const App = () => {
           <AboutSection />
           {/* <TextSection /> */}
           <SkillsSection />
-        
+          <ProjectsSection />
           {/* <Skills />
                         <AboutSection /> */}
         </main>
